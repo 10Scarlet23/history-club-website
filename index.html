@@ -4,7 +4,7 @@
 <section class="front" id="intro"><div><p class="label" id="kicker"></p><h1><span id="head1"></span><br><em id="head2"></em></h1><p class="lead" id="lead"></p><button class="primary" id="start"></button><p class="price" id="price"></p><details class="roster"><summary id="rosterTitle"></summary><p id="rosterList"></p></details></div><aside class="deck" id="deck"></aside></section>
 <section class="sheet" id="quiz" hidden><p class="label" id="count"></p><progress id="bar" max="24" value="1"></progress><h2 id="q" tabindex="-1"></h2><div id="opts" class="opts"></div><button class="plain" id="back"></button></section>
 <section class="sheet" id="gate" hidden><p class="label" id="complete"></p><h2 id="gateTitle" tabindex="-1"></h2><p id="gateDesc"></p>
-<div class="panel" id="voucherPanel" hidden><h3 id="xhs"></h3><p id="xhsDesc"></p><a id="storelink" hidden target="_blank" rel="noopener noreferrer"></a><form id="redeem" class="tools"><input id="code" required maxlength="64" autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="primary" id="use" type="submit"></button></form></div>
+<div class="panel" id="voucherPanel" hidden><h3 id="xhs"></h3><p id="xhsDesc"></p><a id="storelink" hidden target="_blank" rel="noopener noreferrer"></a><form id="redeem" class="tools"><input id="code" required autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="primary" id="use" type="submit"></button></form></div>
 <div class="panel" id="domesticPanel" hidden><h3 id="domesticTitle"></h3><p id="domesticDesc"></p><div class="tools"><button class="primary" id="alipay" hidden></button><button class="primary" id="wechat" hidden></button></div></div><button class="plain" id="checkPayment" hidden></button>
 <div class="panel" id="intlPanel" hidden><h3 id="intl"></h3><p id="intlDesc"></p><div class="tools"><button class="primary" id="checkout"></button><a id="stripeOpen" hidden target="_blank" rel="noopener noreferrer"></a><button class="plain" id="checkStripe" hidden></button></div></div>
 <button id="sample" class="plain" hidden></button><p id="status" class="err" role="status"></p></section>
@@ -58,12 +58,12 @@ function common(){
  if(hostedApiOrigin&&!canUnlock)tx('gateDesc','在线收款暂未开通。你的答卷已保存在当前浏览器。','Online payment is not available yet. Your answers are saved in this browser.');
  $('voucherPanel').hidden=!cfg.vouchers;
  tx('xhs',cfg.shop?'小红书解锁 · ¥0.99':'用兑换码解锁',cfg.shop?'Xiaohongshu · ¥0.99':'Unlock with a code');
- if(cfg.shop)tx('xhsDesc','购买后，在小红书订单详情的「发货信息」里找到兑换码，再回到这个浏览器的这份答卷填写。','After buying, find your code under delivery details in your Xiaohongshu order. Then enter it here in the same browser.');
+ if(cfg.shop)tx('xhsDesc','购买后，复制小红书订单详情里的整段「发货内容」，回到这份答卷粘贴。网站会自动取出兑换码。','Copy the delivery message from your Xiaohongshu order, then paste it into this quiz in the same browser. We’ll pick out your code.');
  else tx('xhsDesc','请输入收到的兑换码。','Enter the code you received.');
  $('storelink').hidden=!cfg.shop;
  if(cfg.shop)$('storelink').href=cfg.shop;else $('storelink').removeAttribute('href');
  tx('storelink','去小红书购买','Buy on Xiaohongshu');
- $('code').placeholder=t('输入兑换码','Enter your code');$('code').setAttribute('aria-label',$('code').placeholder);
+ $('code').placeholder=cfg.shop?t('粘贴兑换码或整段发货内容','Paste a code or delivery message'):t('输入兑换码','Enter your code');$('code').setAttribute('aria-label',$('code').placeholder);
  tx('use','解锁完整报告','Unlock full report');$('use').disabled=pending;
  $('intlPanel').hidden=!cfg.stripe;tx('intl','国际支付 · US$0.50','Pay online · US$0.50');tx('checkout','前往 Stripe 支付','Continue to Stripe');$('checkout').disabled=!cfg.stripe||pending;
  if(cfg.stripeShared)tx('intlDesc','Stripe 会在新标签页打开。付款后回到这份答卷，等网站确认付款。若报告还未解锁，可以点「查询付款」。','Stripe opens in a new tab. After paying, return to this quiz to unlock your report. If it is still locked, select Check payment.');
@@ -91,7 +91,7 @@ function question(){
 }
 function start(){const ids=drawQuestions();data={key:random(),answers:[],ids,position:0,orders:ids.map(()=>shuffle([0,1,2,3]))};current=null;$('status').textContent='';$('code').value='';$('stripeOpen').hidden=true;$('stripeOpen').removeAttribute('href');$('saved').hidden=true;persist();show('quiz');question();$('q').focus()}
 async function api(route,extra){if(offlineLang&&route==='preview')return report(data.answers,lang,data.ids);const r=await fetch(apiUrl(route),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({answers:data.answers,ids:data.ids,key:data.key,lang,...extra})});const j=await r.json();if(!r.ok)throw Error(j.error);return j}
-function error(e){const errs={code:['兑换码无效，请核对后重试。','Invalid code. Check it and try again.'],used:['这枚兑换码已用于另一份答卷。请核对订单。','This code was already used for a different set of answers. Check your order.'],unpaid:['暂未确认付款。如果已经付过，请稍后再查一次。','Payment has not been confirmed. If you have already paid, check again shortly.'],expired:['本次支付订单已关闭，请重新发起付款。','This payment order has closed. Start checkout again.'],unavailable:['此支付方式暂不可用。','This payment option is unavailable.'],storage:['当前浏览器无法保存答题记录。请换用允许本地存储的浏览器后支付。','Use a browser with local storage enabled before paying.']};$('status').textContent=(errs[e.message]||['暂时无法连接，请重试。','Could not connect. Please try again.'])[Number(en())]}
+function error(e){const errs={code:['兑换码无效，请核对后重试。','Invalid code. Check it and try again.'],multipleCodes:['找到了多枚兑换码，请一次只粘贴一枚。','We found several codes. Paste one code at a time.'],used:['这枚兑换码已用于另一份答卷。请核对订单。','This code was already used for a different set of answers. Check your order.'],unpaid:['暂未确认付款。如果已经付过，请稍后再查一次。','Payment has not been confirmed. If you have already paid, check again shortly.'],expired:['本次支付订单已关闭，请重新发起付款。','This payment order has closed. Start checkout again.'],unavailable:['此支付方式暂不可用。','This payment option is unavailable.'],storage:['当前浏览器无法保存答题记录。请换用允许本地存储的浏览器后支付。','Use a browser with local storage enabled before paying.']};$('status').textContent=(errs[e.message]||['暂时无法连接，请重试。','Could not connect. Please try again.'])[Number(en())]}
 function paint(){
  for(const k of ['name','bio','connection'])$(k).textContent=current[k];
  const p=current.portrait;
@@ -125,11 +125,31 @@ async function redeem(route,extra={},retries=0){
 }
 $('sample').onclick=()=>redeem('preview');
 $('storelink').onclick=e=>{if(!persist()){e.preventDefault();error(Error('storage'))}};
+function voucherCodes(value){
+ const text=value.toUpperCase().replace(/[‐‑–—]/g,'-');
+ const compact=text.replace(/[-\s]/g,'');
+ if(/^[0-9A-F]{32}$/.test(compact))return [compact];
+ const matches=text.match(/(?<![A-Z0-9])(?:[0-9A-F]{32}|[0-9A-F]{4}(?:[-\s]+[0-9A-F]{4}){7})(?![A-Z0-9])/g)||[];
+ return [...new Set(matches.map(code=>code.replace(/[-\s]/g,'')))];
+}
+$('code').onpaste=e=>{
+ const codes=voucherCodes(e.clipboardData?.getData('text/plain')||'');
+ if(!codes.length)return;
+ e.preventDefault();
+ if(codes.length>1){
+  $('code').value='';error(Error('multipleCodes'));return;
+ }
+ $('code').value=codes[0].match(/.{4}/g).join('-');
+ $('status').textContent='';
+};
 $('redeem').onsubmit=async e=>{
  e.preventDefault();
  if(!cfg.vouchers||pending)return;
+ const codes=voucherCodes($('code').value);
+ if(codes.length>1){error(Error('multipleCodes'));return}
+ if(codes.length===0){error(Error('code'));return}
  if(!persist()){error(Error('storage'));return}
- if(await redeem('redeem',{code:$('code').value.trim()}))$('code').value='';
+ if(await redeem('redeem',{code:codes[0]}))$('code').value='';
 };
 $('checkPayment').onclick=()=>redeem('domestic/receipt',{},3);
 async function domesticCheckout(provider){
