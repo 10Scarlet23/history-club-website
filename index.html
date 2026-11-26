@@ -42,34 +42,34 @@ function updateLanguageUrl(){
 }
 const apiUrl=route=>(hostedApiOrigin||'')+'/api/'+route;
 function common(){
- document.documentElement.lang=en()?'en':'zh-CN';document.title=t('历史同桌 · 人物趣味测试','History Club · Your historical kindred spirit');
+ document.documentElement.lang=en()?'en':'zh-CN';document.title=t('历史同桌 · 趣味人物配对','History Club · Find your historical deskmate');
  $('zh').setAttribute('aria-pressed',String(!en()));$('en').setAttribute('aria-pressed',String(en()));
- tx('brand','历史同桌','History Club');tx('kicker','随机 24 题 · '+roster.length+' 位历史名人','24 questions · '+roster.length+' historical figures');
+ tx('brand','历史同桌','History Club');tx('kicker','随机 24 题 · '+roster.length+' 位历史人物','24 random questions · '+roster.length+' historical figures');
  tx('rosterTitle','查看全部 '+roster.length+' 位人物','Meet all '+roster.length+' figures'); $('rosterList').textContent=roster.map(p=>p[Number(en())]).join(en()?' · ':'、');
- tx('head1','跨越时空，','Across time,');tx('head2','谁和你合拍？','who gets you?');
- tx('lead','一次临时改道，一张空白明信片。从 60 道生活题中随机抽出 24 道，根据你的选择，找到和你做事方式合拍的历史名人。','A change of plans. A blank postcard. A fresh draw of 24 from 60 everyday questions reveals a figure from history who might see things your way.');
+ tx('head1','跨越时空，','Across time,');tx('head2','谁会坐你旁边？','who would share your desk?');
+ tx('lead','错过一班早班车，挑一件旅行纪念品。我们从 60 道生活题里随机抽 24 道，看看 '+roster.length+' 位历史人物里，谁会坐你旁边。','You miss the morning bus. You pick a souvenir on a trip. No history trivia here. Answer 24 everyday questions drawn from 60 and find your deskmate among '+roster.length+' figures from history.');
  const domestic=cfg.alipay||cfg.wechat, canUnlock=cfg.vouchers||cfg.stripe||domestic&&!en();
- tx('start','开始测试','Take the quiz');tx('price',domestic||cfg.shop?'答题免费 · 单次解锁 ¥0.99':cfg.stripe?'答题免费 · 单次解锁 US$0.50':'答题免费',cfg.stripe?'Free to play · One report US$0.50':'Free to play');
+ tx('start','找找我的同桌','Find my deskmate');tx('price',domestic||cfg.shop?'答题免费 · 完整报告 ¥0.99':cfg.stripe?'答题免费 · 完整报告 US$0.50':'答题免费',cfg.stripe?'Free quiz · Full report US$0.50':'Free quiz');
  if(hostedApiOrigin&&!canUnlock)tx('price','在线收款暂未开通','Online payment is not available yet');
  if(domestic&&!cfg.shop&&!en()&&inPaymentApp())$('price').textContent+='。如需使用网页支付，请先在手机系统浏览器打开本页再答题。';
  $('deck').replaceChildren();for(const pair of [['葛饰北斋','Katsushika Hokusai','版画家 · 《神奈川冲浪里》','Printmaker · The Great Wave'],['爱因斯坦','Albert Einstein','物理学家 · 相对论','Physicist · Relativity'],['李白','Li Bai','诗人 · 《静夜思》','Poet · Quiet Night Thought']]){const div=document.createElement('div');div.className='ticket';const big=document.createElement('span');big.className='portraitName';big.textContent=pair[Number(en())];const small=document.createElement('small');small.textContent=pair[2+Number(en())];div.append(big,small);$('deck').append(div)}
- tx('foot','原创娱乐测试 · 人物匹配为趣味类比','Just for fun · Matches are creative interpretations');
- tx('back','上一题','Previous question');const total=data.ids?.length||data.orders?.length||24;tx('complete',total+' / '+total+' · 答题完成',total+' / '+total+' · Quiz complete');tx('gateTitle','你的同桌已选好。','Your match is ready.');tx('gateDesc','解锁人物肖像和长篇解析，读一段真实经历，再一起回看你的选择。中文解析超过 2,000 字，可切换英文并保存结果卡。','Meet your match through a portrait, a sourced episode from their life and a detailed reading of your own choices. Both languages and a keepsake card are included.');
+ tx('foot','原创趣味测试 · 人物配对仅供娱乐','A playful match, just for fun.');
+ tx('back','上一题','Previous question');const total=data.ids?.length||data.orders?.length||24;tx('complete',total+' / '+total+' · 答题完成',total+' / '+total+' · Quiz complete');tx('gateTitle','同桌已经选好了。','We found your deskmate.');tx('gateDesc','解锁完整报告，看看同桌是谁，读一段有出处的真实经历，再回看你的选择。报告含人物肖像和 2,000 多字的中文解析，可切换英文并保存结果卡。','Unlock the full report to meet your deskmate. It includes their portrait, a sourced story from their life, and a closer look at your choices. Read it in either language and save a shareable result card.');
  if(hostedApiOrigin&&!canUnlock)tx('gateDesc','在线收款暂未开通。你的答卷已保存在当前浏览器。','Online payment is not available yet. Your answers are saved in this browser.');
  $('voucherPanel').hidden=!cfg.vouchers;
  tx('xhs',cfg.shop?'小红书解锁 · ¥0.99':'用兑换码解锁',cfg.shop?'Xiaohongshu · ¥0.99':'Unlock with a code');
- if(cfg.shop)tx('xhsDesc','购买后，把收到的兑换码填回这份答卷。','After purchase, return to this quiz and enter the code you received.');
+ if(cfg.shop)tx('xhsDesc','购买后，在小红书订单详情的「发货信息」里找到兑换码，再回到这个浏览器的这份答卷填写。','After buying, find your code under delivery details in your Xiaohongshu order. Then enter it here in the same browser.');
  else tx('xhsDesc','请输入收到的兑换码。','Enter the code you received.');
  $('storelink').hidden=!cfg.shop;
  if(cfg.shop)$('storelink').href=cfg.shop;else $('storelink').removeAttribute('href');
- tx('storelink','打开小红书商品页','Open the Xiaohongshu listing');
+ tx('storelink','去小红书购买','Buy on Xiaohongshu');
  $('code').placeholder=t('输入兑换码','Enter your code');$('code').setAttribute('aria-label',$('code').placeholder);
- tx('use','解锁完整报告','Unlock my report');$('use').disabled=pending;
+ tx('use','解锁完整报告','Unlock full report');$('use').disabled=pending;
  $('intlPanel').hidden=!cfg.stripe;tx('intl','国际支付 · US$0.50','Pay online · US$0.50');tx('checkout','前往 Stripe 支付','Continue to Stripe');$('checkout').disabled=!cfg.stripe||pending;
- if(cfg.stripeShared)tx('intlDesc','Stripe 会在新标签页打开。付完回到这份答卷，网站会确认到账并解锁。','Stripe opens in a new tab. Return to this quiz after paying to unlock your report.');
+ if(cfg.stripeShared)tx('intlDesc','Stripe 会在新标签页打开。付款后回到这份答卷，等网站确认付款。若报告还未解锁，可以点「查询付款」。','Stripe opens in a new tab. After paying, return to this quiz to unlock your report. If it is still locked, select Check payment.');
  else if(cfg.stripeTest)tx('intlDesc','Stripe 测试模式，无实际扣款。','Stripe test mode. No real charge.');
- else tx('intlDesc','使用 Stripe 安全结账，支付后返回这里。','Check out with Stripe and return here.');
- $('checkStripe').hidden=!cfg.stripeShared||data.session!=='link';$('checkStripe').disabled=pending;tx('checkStripe','查询 Stripe 付款结果','Check Stripe payment');
+ else tx('intlDesc','在 Stripe 完成付款后，回到本页查看报告。','Pay with Stripe, then return here to see your report.');
+ $('checkStripe').hidden=!cfg.stripeShared||data.session!=='link';$('checkStripe').disabled=pending;tx('checkStripe','查询付款','Check payment');
  tx('stripeOpen','打开 Stripe 结账页','Open Stripe checkout');
  $('domesticPanel').hidden=en()||!domestic;
  tx('domesticTitle','人民币支付 · ¥0.99','Pay in CNY · ¥0.99');
@@ -81,7 +81,7 @@ function common(){
  $('sample').hidden=!cfg.preview;tx('sample','试用版免费查看本次结果','Preview my result for free');
  tx('imageSource','图像来源','Image source');tx('license','图像许可','Image licence');
  if(offlineLang)tx('price','离线试用 · 完整解析免费查看','Offline preview · Full report included');
- tx('save','保存结果卡','Save result card');tx('restart','重新测试','Start again');tx('savehint','长按图片保存，或点下方下载。','Press and hold the image to save, or use the download link.');tx('download','下载 PNG','Download PNG');
+ tx('save','保存结果卡','Save result card');tx('restart','重新答题','Retake the quiz');tx('savehint','长按图片保存，也可以点下方按钮下载。','Press and hold the image to save it, or use the download button below.');tx('download','下载 PNG','Download PNG');
 }
 function question(){
  const i=data.position,s=data.ids?questions[data.ids[i]]:legacyQuestions[i],l=Number(en()),total=data.orders.length;tx('count','第 '+(i+1)+' 题 / 共 '+total+' 题','Question '+(i+1)+' of '+total);$('bar').max=total;$('bar').value=i+1;$('bar').setAttribute('aria-label',$('count').textContent);
@@ -91,7 +91,7 @@ function question(){
 }
 function start(){const ids=drawQuestions();data={key:random(),answers:[],ids,position:0,orders:ids.map(()=>shuffle([0,1,2,3]))};current=null;$('status').textContent='';$('code').value='';$('stripeOpen').hidden=true;$('stripeOpen').removeAttribute('href');$('saved').hidden=true;persist();show('quiz');question();$('q').focus()}
 async function api(route,extra){if(offlineLang&&route==='preview')return report(data.answers,lang,data.ids);const r=await fetch(apiUrl(route),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({answers:data.answers,ids:data.ids,key:data.key,lang,...extra})});const j=await r.json();if(!r.ok)throw Error(j.error);return j}
-function error(e){const errs={code:['兑换码不正确，请核对订单。','Check the code against your order.'],used:['该码已用于另一份结果，请核对订单。','That code was used for another result. Check your order.'],unpaid:['暂未确认付款。若已付款，请稍后查询付款结果。','Payment is not confirmed yet. Check again in a moment.'],expired:['本次支付订单已关闭，请重新发起付款。','This payment order has closed. Start checkout again.'],unavailable:['此支付方式暂不可用。','This payment option is unavailable.'],storage:['当前浏览器无法保存答题记录。请换用允许本地存储的浏览器后支付。','Use a browser with local storage enabled before paying.']};$('status').textContent=(errs[e.message]||['暂时无法连接，请重试。','Could not connect. Please try again.'])[Number(en())]}
+function error(e){const errs={code:['兑换码无效，请核对后重试。','Invalid code. Check it and try again.'],used:['这枚兑换码已用于另一份答卷。请核对订单。','This code was already used for a different set of answers. Check your order.'],unpaid:['暂未确认付款。如果已经付过，请稍后再查一次。','Payment has not been confirmed. If you have already paid, check again shortly.'],expired:['本次支付订单已关闭，请重新发起付款。','This payment order has closed. Start checkout again.'],unavailable:['此支付方式暂不可用。','This payment option is unavailable.'],storage:['当前浏览器无法保存答题记录。请换用允许本地存储的浏览器后支付。','Use a browser with local storage enabled before paying.']};$('status').textContent=(errs[e.message]||['暂时无法连接，请重试。','Could not connect. Please try again.'])[Number(en())]}
 function paint(){
  for(const k of ['name','bio','connection'])$(k).textContent=current[k];
  const p=current.portrait;
@@ -102,10 +102,10 @@ function paint(){
   const block=document.createElement('div');block.className='chapter';
   const h=document.createElement('h3');h.textContent=chapter.title;block.append(h);
   for(const paragraph of chapter.paragraphs){const node=document.createElement('p');node.textContent=paragraph;block.append(node)}
-  if(chapter.source){const a=document.createElement('a');a.href=chapter.source;a.target='_blank';a.rel='noopener';a.textContent=t('关于这段历史','Read the historical source');block.append(a)}
+  if(chapter.source){const a=document.createElement('a');a.href=chapter.source;a.target='_blank';a.rel='noopener';a.textContent=t('查看历史出处','View historical source');block.append(a)}
   $('chapters').append(block);
  }
- $('edition').textContent=data.access?.route==='preview'?t('试用结果 · 你的历史同桌','Preview · Your historical match'):t('你的历史同桌','Your historical match');
+ $('edition').textContent=data.access?.route==='preview'?t('试用结果 · 你的历史同桌','Preview · Your deskmate'):t('你的历史同桌','Your historical deskmate');
  $('saved').hidden=true;show('result');$('name').focus();
 }
 async function redeem(route,extra={},retries=0){
